@@ -1,0 +1,35 @@
+# netguard-ml training configuration
+# All values can be overridden from the CLI.
+
+seed: 42
+
+preprocess:
+  # Explicit categorical columns. Leave empty to auto-detect
+  # (object / low-cardinality columns are treated as categorical).
+  categorical_columns: [protocol_type, service, flag]
+  # Cap one-hot cardinality for very high-cardinality columns.
+  max_onehot_categories: 50
+
+isolation_forest:
+  n_estimators: 200
+  contamination: 0.05
+
+autoencoder:
+  encoder_dims: [64, 32]   # encoder hidden layers; last entry is the latent dim
+  epochs: 40
+  batch_size: 256
+  learning_rate: 0.001
+  validation_split: 0.1
+
+ensemble:
+  isolation_forest_weight: 0.5
+  autoencoder_weight: 0.5
+  # risk_score >= critical  -> "critical"
+  # risk_score >= suspicious -> "suspicious"
+  # otherwise                -> "normal"
+  critical_threshold: 70
+  suspicious_threshold: 50
+  top_k_features: 5
+
+train:
+  test_size: 0.2   # held-out split used for calibration / metrics
